@@ -148,7 +148,7 @@ fun MineClicker() {
     }
 
     var esmeraldaganha by remember {
-        mutableStateOf(75)
+        mutableStateOf(1)
     }
     var picareta by remember {
         mutableStateOf(R.drawable.woodpickaxe)

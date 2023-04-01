@@ -9,10 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -27,7 +24,9 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.kotlinclicker.ui.theme.KotlinClickerTheme
-
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
+import kotlinx.coroutines.runBlocking
 
 
 class AudioPlayer(context: Context, audioResourceId: Int) {
@@ -62,14 +61,163 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun MineClicker(){
+fun MusicaFundo(musica: Int,) {
+    val context = LocalContext.current
+
+    val audioPlayer = remember(musica) {
+        AudioPlayer(context, audioResourceId = musica)
+    }
+
+    DisposableEffect(audioPlayer) {
+        audioPlayer.play()
+
+        onDispose {
+            audioPlayer.stop()
+        }
+    }
+
+}
+
+@Composable
+fun MineClicker() {
+
     var esmeraldas by remember {
         mutableStateOf(0)
     }
 
-    TelaPrincipal(esmeraldas = esmeraldas)
-    MusicaFundo()
+    var steve by remember {
+        mutableStateOf(false)
+    }
+
+    var villager by remember {
+        mutableStateOf(false)
+    }
+
+    var creeper by remember {
+        mutableStateOf(false)
+    }
+
+    var secret by remember {
+        mutableStateOf(false)
+    }
+
+    var musica by remember {
+        mutableStateOf(R.raw.sweden)
+    }
+
+    var background by remember {
+        mutableStateOf(R.drawable.cavehard)
+    }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            if (steve) {
+                launch(Dispatchers.Default) {
+                    esmeraldas += 1
+                    delay(10000)
+                }
+            }
+            if (villager) {
+                launch(Dispatchers.Default) {
+                    esmeraldas += 5
+                    delay(10000)
+                }
+            }
+            if (creeper) {
+                launch(Dispatchers.Default) {
+                    esmeraldas += 10
+                    delay(10000)
+                }
+            }
+            delay(1000) // delay de 1 segundo antes da próxima iteração
+        }
+    }
+
+    var esmeraldaganha by remember {
+        mutableStateOf(75)
+    }
+    var picareta by remember {
+        mutableStateOf(R.drawable.woodpickaxe)
+    }
+
+    var pickupgrade by remember {
+        mutableStateOf(R.drawable.stonepickaxe)
+    }
+
+    val click: () -> Unit = {
+        esmeraldas += esmeraldaganha
+    }
+
+    val changepick: () -> Unit = {
+        if (pickupgrade == R.drawable.stonepickaxe && esmeraldas >= 50) {
+            esmeraldas -= 50
+            picareta = R.drawable.stonepickaxe
+            pickupgrade = R.drawable.ironpickaxe
+            esmeraldaganha = 2
+        }
+        if (pickupgrade == R.drawable.ironpickaxe && esmeraldas >= 100) {
+            esmeraldas -= 100
+            picareta = R.drawable.ironpickaxe
+            pickupgrade = R.drawable.diamondpickaxe
+            esmeraldaganha = 3
+        }
+        if (pickupgrade == R.drawable.diamondpickaxe && esmeraldas >= 200) {
+            esmeraldas -= 200
+            picareta = R.drawable.diamondpickaxe
+            pickupgrade = R.drawable.vermelho
+            esmeraldaganha = 5
+        }
+    }
+
+    val comprarsteve: () -> Unit = {
+        if (steve == false && esmeraldas >= 75) {
+            esmeraldas -= 75
+            steve = true
+
+        }
+    }
+
+    val comprarvillager: () -> Unit = {
+        if (steve == true && villager == false && esmeraldas >=400 ) {
+            esmeraldas -= 400
+            villager = true
+
+        }
+    }
+
+    val comprarcreeper: () -> Unit = {
+        if (steve == true && villager == true && creeper == false && esmeraldas >= 800) {
+            esmeraldas -= 800
+            creeper = true
+
+        }
+    }
+
+    val comprarsegredo: () -> Unit = {
+        if (steve == true && villager == true && creeper == true && secret == false && esmeraldas >= 1000) {
+            esmeraldas -= 1000
+            musica = R.raw.gilgamesh
+            background = R.drawable.hiitite
+            secret = true
+        }
+    }
+
+    TelaPrincipal(
+            esmeraldas = esmeraldas,
+            picareta = picareta,
+            pickupgrade = pickupgrade,
+            background = background,
+            onStoneClick = click,
+            onPickClick = changepick,
+            onSteveClick = comprarsteve,
+            onVillagerClick = comprarvillager,
+            onCreeperClick = comprarcreeper,
+            onFunnyClick = comprarsegredo
+
+        )
+        MusicaFundo(musica = musica)
 }
+
 
 @Composable
 fun Esmeraldas(
@@ -80,7 +228,7 @@ fun Esmeraldas(
         modifier = Modifier
             .fillMaxWidth()
             .padding(10.dp),
-    ){
+    ) {
         Image(
             painter = painterResource(R.drawable.__2_minecraft_emerald),
             contentDescription = "Esmeralda",
@@ -89,37 +237,33 @@ fun Esmeraldas(
                 .height(20.dp)
                 .padding(top = 4.dp)
         )
-        Text(text = "$qtd", color = Color.Green, modifier = Modifier.padding(start = 5.dp, top=0.dp))
-    }
-}
-/*@Composable
-fun Esmeraldas(esmeraldas: String) {
-    Text(text = esmeraldas,
-        textAlign = TextAlign.Center,
-        fontSize = 24.dp,
-}*/
-
-@Composable
-fun MusicaFundo() {
-    val context = LocalContext.current
-    val audioPlayer = remember { AudioPlayer(context, R.raw.sweden) }
-
-    DisposableEffect(Unit) {
-        audioPlayer.stop()
-
-        onDispose {
-            audioPlayer.stop()
-        }
+        Text(
+            text = "$qtd",
+            color = Color.Green,
+            modifier = Modifier.padding(start = 5.dp, top = 0.dp)
+        )
     }
 }
 
+
 @Composable
-fun TelaPrincipal(esmeraldas: Int){
+fun TelaPrincipal
+            (esmeraldas: Int,
+             picareta: Int,
+             pickupgrade: Int,
+             background: Int,
+             onStoneClick: () -> Unit,
+             onPickClick: () -> Unit,
+             onSteveClick: () -> Unit,
+             onVillagerClick: () -> Unit,
+             onCreeperClick: () -> Unit,
+             onFunnyClick: () -> Unit,){
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
             modifier = Modifier.fillMaxSize(),
-            painter = painterResource(id = R.drawable.cavehard),
+            painter = painterResource(id = background),
             contentDescription = "Background",
             contentScale = ContentScale.Crop,
         )
@@ -145,68 +289,84 @@ fun TelaPrincipal(esmeraldas: Int){
                 .width(45.dp)
                 .height(220.dp)
                 .padding(start = 12.dp, top = 12.dp)
-                .border(
-                    BorderStroke(2.dp, Color(0xFF83816E)),
-                    shape = RoundedCornerShape(8.dp)
-
-                )
                 .align(Alignment.TopStart))
-            /*IconButton(onClick = { *//*TODO*//* }) {
+            IconButton(onClick = onPickClick, modifier = Modifier.align(Alignment.TopEnd),) {
                 Image(
-                    painter = painterResource(R.drawable.stonepick),
+                    painter = painterResource( id = pickupgrade),
                     contentDescription = "My Image 2",
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(top = 25.dp, start = 16.dp)
-                        .width(40.dp)
+                        .padding(top = 11.dp, end = 10.dp)
+                        .width(70.dp)
+                        .border(
+                            BorderStroke(2.dp, Color(0xFF83816E)),
+                            shape = RoundedCornerShape(8.dp)
+
+                        )
+                        .padding(15.dp)
                 )
-            }*/
-            Image(
-                painter = painterResource(R.drawable.stonepickaxe),
-                contentDescription = "My Image 2",
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 11.dp, end = 10.dp)
-                    .width(70.dp)
-                    .border(
-                        BorderStroke(2.dp, Color(0xFF83816E)),
-                        shape = RoundedCornerShape(8.dp)
+            }
+            IconButton(onClick = onSteveClick, modifier = Modifier
+                .padding(top = 10.dp, start = 10.dp)
+                .border(
+                    BorderStroke(2.dp, Color(0xFF83816E)),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .align(Alignment.TopStart),) {
+                Image(
+                    painter = painterResource(R.drawable.sbeve),
+                    contentDescription = "My Image 2",
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .width(20.dp)
+                )
+            }
+            IconButton(onClick = onVillagerClick, modifier = Modifier
+                .padding(top = 70.dp, start = 10.dp)
+                .border(
+                    BorderStroke(2.dp, Color(0xFF83816E)),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .align(Alignment.TopStart),) {
+                Image(
+                    painter = painterResource(R.drawable.big_villager_face),
+                    contentDescription = "My Image 2",
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .width(20.dp)
+                )
+            }
+            IconButton(onClick = onCreeperClick, modifier = Modifier
+                .padding(top = 130.dp, start = 10.dp)
+                .border(
+                    BorderStroke(2.dp, Color(0xFF83816E)),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .align(Alignment.TopStart),) {
+                Image(
+                    painter = painterResource(R.drawable.creeper),
+                    contentDescription = "My Image 2",
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .width(20.dp)
+                )
+            }
 
-                    ).padding(15.dp)
-            )
-            Image(
-                painter = painterResource(R.drawable.sbeve),
-                contentDescription = "My Image 2",
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(top = 20.dp, start = 18.dp)
-                    .width(20.dp)
-            )
-            Image(
-                painter = painterResource(R.drawable.big_villager_face),
-                contentDescription = "My Image 2",
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(top = 70.dp, start = 18.dp)
-                    .width(20.dp)
-            )
-            Image(
-                painter = painterResource(R.drawable.creeper),
-                contentDescription = "My Image 2",
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(top = 120.dp, start = 18.dp)
-                    .width(20.dp)
-            )
-
-            Image(
-                painter = painterResource(R.drawable.questionmark),
-                contentDescription = "My Image 2",
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .padding(top = 170.dp, start = 18.dp)
-                    .width(20.dp)
-            )
+            IconButton(onClick = onFunnyClick, modifier = Modifier
+                .padding(top = 190.dp, start = 10.dp)
+                .border(
+                    BorderStroke(2.dp, Color(0xFF83816E)),
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .align(Alignment.TopStart),) {
+                Image(
+                    painter = painterResource(R.drawable.questionmark),
+                    contentDescription = "My Image 2",
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .width(20.dp)
+                )
+            }
 
         }
         Box (
@@ -214,28 +374,29 @@ fun TelaPrincipal(esmeraldas: Int){
                 .align(Alignment.BottomCenter)
                 .padding(16.dp)
         ){
-
+            IconButton(onClick = onStoneClick) {
             Image(
                 painter = painterResource(id = R.drawable.stoneblock),
                 contentDescription = "My Image",
                 modifier = Modifier
-                    .width(100.dp) // Set the width of the image
-                    .height(100.dp) // Set the height of the image
+                    .width(100.dp)
+                    .height(100.dp)
             )
+            }
         }
 
         Box (
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(bottom = 100.dp, start = 70.dp)
+                .padding(bottom = (100.dp), start = (60.dp))
         ){
 
             Image(
-                painter = painterResource(id = R.drawable.woodpickaxe),
+                painter = painterResource(id = picareta),
                 contentDescription = "My Image",
                 modifier = Modifier
-                    .width(100.dp) // Set the width of the image
-                    .height(100.dp) // Set the height of the image
+                    .width(100.dp)
+                    .height(100.dp)
             )
         }
 

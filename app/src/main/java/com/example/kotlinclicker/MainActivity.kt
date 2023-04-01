@@ -18,15 +18,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.kotlinclicker.ui.theme.KotlinClickerTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.*
 import kotlinx.coroutines.runBlocking
+import org.w3c.dom.Text
 
 
 class AudioPlayer(context: Context, audioResourceId: Int) {
@@ -114,19 +117,25 @@ fun MineClicker() {
             if (steve) {
                 launch(Dispatchers.Default) {
                     esmeraldas += 1
-                    delay(10000)
+                    delay(1000)
                 }
             }
             if (villager) {
                 launch(Dispatchers.Default) {
                     esmeraldas += 5
-                    delay(10000)
+                    delay(1000)
                 }
             }
             if (creeper) {
                 launch(Dispatchers.Default) {
                     esmeraldas += 10
-                    delay(10000)
+                    delay(1000)
+                }
+            }
+            if (secret) {
+                launch(Dispatchers.Default) {
+                    esmeraldas += 1000
+                    delay(1000)
                 }
             }
             delay(1000) // delay de 1 segundo antes da próxima iteração
@@ -207,6 +216,7 @@ fun MineClicker() {
             picareta = picareta,
             pickupgrade = pickupgrade,
             background = background,
+            secret = secret,
             onStoneClick = click,
             onPickClick = changepick,
             onSteveClick = comprarsteve,
@@ -252,12 +262,14 @@ fun TelaPrincipal
              picareta: Int,
              pickupgrade: Int,
              background: Int,
+             secret: Boolean,
              onStoneClick: () -> Unit,
              onPickClick: () -> Unit,
              onSteveClick: () -> Unit,
              onVillagerClick: () -> Unit,
              onCreeperClick: () -> Unit,
              onFunnyClick: () -> Unit,){
+
 
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -271,140 +283,176 @@ fun TelaPrincipal
             modifier = Modifier
                 .fillMaxSize()
                 .border(
-                    BorderStroke(2.dp, Color(0xBCB6845D)),
+                    if(secret != true){
+                        BorderStroke(2.dp, Color(0xBCB6845D))
+                    }else{
+                        BorderStroke(2.dp, Color.Yellow)
+                         },
                     shape = RoundedCornerShape(8.dp)
                 ),
             contentAlignment = Alignment.TopCenter
 
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Esmeraldas(qtd = esmeraldas)
+            if (secret == true) {
+                Text(
+                    text = "VOCÊ VENCEU!",
+                    color = Color.Yellow,
+                    modifier = Modifier.padding(start = 0.dp, top = 400.dp),
+                    style = TextStyle(fontSize = 50.sp)
+                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Esmeraldas(qtd = esmeraldas)
+                }
             }
 
-            Box(modifier = Modifier
-                .width(45.dp)
-                .height(220.dp)
-                .padding(start = 12.dp, top = 12.dp)
-                .align(Alignment.TopStart))
-            IconButton(onClick = onPickClick, modifier = Modifier.align(Alignment.TopEnd),) {
-                Image(
-                    painter = painterResource( id = pickupgrade),
-                    contentDescription = "My Image 2",
+            if (secret != true) {
+                Column(
                     modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(top = 11.dp, end = 10.dp)
-                        .width(70.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Esmeraldas(qtd = esmeraldas)
+                }
+
+                Box(
+                    modifier = Modifier
+                        .width(45.dp)
+                        .height(220.dp)
+                        .padding(start = 12.dp, top = 12.dp)
+                        .align(Alignment.TopStart)
+                )
+                IconButton(onClick = onPickClick, modifier = Modifier.align(Alignment.TopEnd),) {
+                    Image(
+                        painter = painterResource(id = pickupgrade),
+                        contentDescription = "My Image 2",
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(top = 11.dp, end = 10.dp)
+                            .width(70.dp)
+                            .border(
+                                BorderStroke(2.dp, Color(0xFF83816E)),
+                                shape = RoundedCornerShape(8.dp)
+
+                            )
+                            .padding(15.dp)
+                    )
+                }
+                IconButton(
+                    onClick = onSteveClick,
+                    modifier = Modifier
+                        .padding(top = 10.dp, start = 10.dp)
                         .border(
                             BorderStroke(2.dp, Color(0xFF83816E)),
                             shape = RoundedCornerShape(8.dp)
-
                         )
-                        .padding(15.dp)
-                )
-            }
-            IconButton(onClick = onSteveClick, modifier = Modifier
-                .padding(top = 10.dp, start = 10.dp)
-                .border(
-                    BorderStroke(2.dp, Color(0xFF83816E)),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .align(Alignment.TopStart),) {
-                Image(
-                    painter = painterResource(R.drawable.sbeve),
-                    contentDescription = "My Image 2",
+                        .align(Alignment.TopStart),
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.sbeve),
+                        contentDescription = "My Image 2",
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .width(20.dp)
+                    )
+                }
+                IconButton(
+                    onClick = onVillagerClick,
                     modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .width(20.dp)
-                )
-            }
-            IconButton(onClick = onVillagerClick, modifier = Modifier
-                .padding(top = 70.dp, start = 10.dp)
-                .border(
-                    BorderStroke(2.dp, Color(0xFF83816E)),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .align(Alignment.TopStart),) {
-                Image(
-                    painter = painterResource(R.drawable.big_villager_face),
-                    contentDescription = "My Image 2",
+                        .padding(top = 70.dp, start = 10.dp)
+                        .border(
+                            BorderStroke(2.dp, Color(0xFF83816E)),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .align(Alignment.TopStart),
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.big_villager_face),
+                        contentDescription = "My Image 2",
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .width(20.dp)
+                    )
+                }
+                IconButton(
+                    onClick = onCreeperClick,
                     modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .width(20.dp)
-                )
-            }
-            IconButton(onClick = onCreeperClick, modifier = Modifier
-                .padding(top = 130.dp, start = 10.dp)
-                .border(
-                    BorderStroke(2.dp, Color(0xFF83816E)),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .align(Alignment.TopStart),) {
-                Image(
-                    painter = painterResource(R.drawable.creeper),
-                    contentDescription = "My Image 2",
+                        .padding(top = 130.dp, start = 10.dp)
+                        .border(
+                            BorderStroke(2.dp, Color(0xFF83816E)),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .align(Alignment.TopStart),
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.creeper),
+                        contentDescription = "My Image 2",
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .width(20.dp)
+                    )
+                }
+
+                IconButton(
+                    onClick = onFunnyClick,
                     modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .width(20.dp)
-                )
-            }
+                        .padding(top = 190.dp, start = 10.dp)
+                        .border(
+                            BorderStroke(2.dp, Color(0xFF83816E)),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .align(Alignment.TopStart),
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.questionmark),
+                        contentDescription = "My Image 2",
+                        modifier = Modifier
+                            .align(Alignment.TopStart)
+                            .width(20.dp)
+                    )
+                }
 
-            IconButton(onClick = onFunnyClick, modifier = Modifier
-                .padding(top = 190.dp, start = 10.dp)
-                .border(
-                    BorderStroke(2.dp, Color(0xFF83816E)),
-                    shape = RoundedCornerShape(8.dp)
-                )
-                .align(Alignment.TopStart),) {
-                Image(
-                    painter = painterResource(R.drawable.questionmark),
-                    contentDescription = "My Image 2",
+
+                Box(
                     modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .width(20.dp)
-                )
+                        .align(Alignment.BottomCenter)
+                        .padding(16.dp)
+                ) {
+                    IconButton(onClick = onStoneClick) {
+                        Image(
+                            painter = painterResource(id = R.drawable.stoneblock),
+                            contentDescription = "My Image",
+                            modifier = Modifier
+                                .width(100.dp)
+                                .height(100.dp)
+                        )
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .padding(bottom = (100.dp), start = (60.dp))
+                ) {
+
+                    Image(
+                        painter = painterResource(id = picareta),
+                        contentDescription = "My Image",
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(100.dp)
+                    )
+                }
             }
 
-        }
-        Box (
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp)
-        ){
-            IconButton(onClick = onStoneClick) {
-            Image(
-                painter = painterResource(id = R.drawable.stoneblock),
-                contentDescription = "My Image",
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(100.dp)
-            )
-            }
-        }
 
-        Box (
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(bottom = (100.dp), start = (60.dp))
-        ){
-
-            Image(
-                painter = painterResource(id = picareta),
-                contentDescription = "My Image",
-                modifier = Modifier
-                    .width(100.dp)
-                    .height(100.dp)
-            )
-        }
-
-
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
 //            Scoreboard(wins = wins, draws = draws, losses = losses)
 //            Cards(dealerHand, showAllCards = showAllCards)
 //            if(showAllCards)
@@ -415,6 +463,7 @@ fun TelaPrincipal
 //
 //            Cards(playerHand, showAllCards = true)
 //            PlayerActions(onHitButtonClick, onHoldButtonClick, showAllCards)
+            }
         }
     }
 }

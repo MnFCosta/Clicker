@@ -12,24 +12,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.kotlinclicker.ui.theme.KotlinClickerTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.*
-import kotlinx.coroutines.runBlocking
-import org.w3c.dom.Text
 
 
 class AudioPlayer(context: Context, audioResourceId: Int) {
@@ -49,8 +43,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            KotlinClickerTheme() {
-                // A surface container using the 'background' color from the theme
+            KotlinClickerTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
@@ -112,6 +105,18 @@ fun MineClicker() {
         mutableStateOf(R.drawable.cavehard)
     }
 
+    var qtdproxpick by remember {
+        mutableStateOf(50)
+    }
+
+    val precosteve = 75
+
+    val precovillager = 400
+
+    val precocreeper = 800
+
+    val precosecret = 1000
+
     LaunchedEffect(Unit) {
         while (true) {
             if (steve) {
@@ -163,12 +168,14 @@ fun MineClicker() {
             picareta = R.drawable.stonepickaxe
             pickupgrade = R.drawable.ironpickaxe
             esmeraldaganha = 2
+            qtdproxpick = 100
         }
         if (pickupgrade == R.drawable.ironpickaxe && esmeraldas >= 100) {
             esmeraldas -= 100
             picareta = R.drawable.ironpickaxe
             pickupgrade = R.drawable.diamondpickaxe
             esmeraldaganha = 3
+            qtdproxpick = 200
         }
         if (pickupgrade == R.drawable.diamondpickaxe && esmeraldas >= 200) {
             esmeraldas -= 200
@@ -216,7 +223,15 @@ fun MineClicker() {
             picareta = picareta,
             pickupgrade = pickupgrade,
             background = background,
+            steve = steve,
+            villager = villager,
+            creeper = creeper,
             secret = secret,
+            qtdproxpick = qtdproxpick,
+            precosteve = precosteve,
+            precovillager = precovillager,
+            precocreeper = precocreeper,
+            precosecret = precosecret,
             onStoneClick = click,
             onPickClick = changepick,
             onSteveClick = comprarsteve,
@@ -262,6 +277,14 @@ fun TelaPrincipal
              picareta: Int,
              pickupgrade: Int,
              background: Int,
+             qtdproxpick: Int,
+             precosteve: Int,
+             precovillager: Int,
+             precocreeper: Int,
+             precosecret: Int,
+             steve: Boolean,
+             villager: Boolean,
+             creeper: Boolean,
              secret: Boolean,
              onStoneClick: () -> Unit,
              onPickClick: () -> Unit,
@@ -340,6 +363,14 @@ fun TelaPrincipal
                             )
                             .padding(15.dp)
                     )
+                    if( pickupgrade != R.drawable.vermelho) {
+                        Text(
+                            text = "$qtdproxpick",
+                            color = Color.Yellow,
+                            modifier = Modifier.padding(start = 0.dp, top = 50.dp),
+                            style = TextStyle(fontSize = 14.sp)
+                        )
+                    }
                 }
                 IconButton(
                     onClick = onSteveClick,
@@ -358,6 +389,14 @@ fun TelaPrincipal
                             .align(Alignment.TopStart)
                             .width(20.dp)
                     )
+                    if(steve != true){
+                    Text(
+                        text = "$precosteve",
+                        color = Color.Yellow,
+                        modifier = Modifier.padding(top = 25.dp),
+                        style = TextStyle(fontSize = 14.sp)
+                    )
+                    }
                 }
                 IconButton(
                     onClick = onVillagerClick,
@@ -376,6 +415,14 @@ fun TelaPrincipal
                             .align(Alignment.TopStart)
                             .width(20.dp)
                     )
+                    if(villager != true) {
+                        Text(
+                            text = "$precovillager",
+                            color = Color.Yellow,
+                            modifier = Modifier.padding(top = 25.dp),
+                            style = TextStyle(fontSize = 14.sp)
+                        )
+                    }
                 }
                 IconButton(
                     onClick = onCreeperClick,
@@ -394,6 +441,14 @@ fun TelaPrincipal
                             .align(Alignment.TopStart)
                             .width(20.dp)
                     )
+                    if(creeper != true) {
+                        Text(
+                            text = "$precocreeper",
+                            color = Color.Yellow,
+                            modifier = Modifier.padding(top = 25.dp),
+                            style = TextStyle(fontSize = 14.sp)
+                        )
+                    }
                 }
 
                 IconButton(
@@ -409,9 +464,15 @@ fun TelaPrincipal
                     Image(
                         painter = painterResource(R.drawable.questionmark),
                         contentDescription = "My Image 2",
-                        modifier = Modifier
+                        modifier = Modifier.padding(start= 5.dp)
                             .align(Alignment.TopStart)
                             .width(20.dp)
+                    )
+                    Text(
+                        text = "$precosecret",
+                        color = Color.Yellow,
+                        modifier = Modifier.padding(top = 25.dp),
+                        style = TextStyle(fontSize = 14.sp)
                     )
                 }
 
@@ -446,23 +507,6 @@ fun TelaPrincipal
                             .height(100.dp)
                     )
                 }
-            }
-
-
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.SpaceBetween
-            ) {
-//            Scoreboard(wins = wins, draws = draws, losses = losses)
-//            Cards(dealerHand, showAllCards = showAllCards)
-//            if(showAllCards)
-//                GameResult(
-//                    playerPoints = playerPoints,
-//                    dealerPoints = dealerPoints,
-//                    onPlayAgainButtonClick = onPlayAgainButtonClick,)
-//
-//            Cards(playerHand, showAllCards = true)
-//            PlayerActions(onHitButtonClick, onHoldButtonClick, showAllCards)
             }
         }
     }

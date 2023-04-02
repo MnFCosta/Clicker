@@ -307,7 +307,7 @@ fun TelaPrincipal
                 .fillMaxSize()
                 .border(
                     if(secret != true){
-                        BorderStroke(2.dp, Color(0xBCB6845D))
+                        BorderStroke(2.dp, Color(0xBC572929))
                     }else{
                         BorderStroke(2.dp, Color.Yellow)
                          },
